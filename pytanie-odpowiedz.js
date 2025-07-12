@@ -9,7 +9,7 @@ function onPageLoad()
 
     var exerciceBody = document.getElementById("exercice-wrapper");
     questions = [ "Przetłumacz na język francuski", "Jak powiedzieć: 'To gaduła/krzykacz'?", "Jak powiedzieć: '(On) Ma świński charakter'?", "Jak powiedzieć: 'To gbur/mruk' (o osobie)?", "Jak powiedzieć: 'Zadziera nosa!'?", "Jak powiedzieć: 'To leser'?", "Jak powiedzieć: 'To pozer'?", "Jak powiedzieć: 'Ona ma długie ręce/wpływy'?", "Jak powiedzieć: 'Jest śliczna jak obrazek'?", "Jak powiedzieć: '(On) Ma kręcone włosy jak baranek'?", "Jak powiedzieć: 'Marc jest brzydki jak noc'?", "Jak powiedzieć: 'Alice jest ślepa jak kret'?", "Jak powiedzieć: 'To wredota'?", "Jak powiedzieć: 'Marc, to tchórz'?", "Jak powiedzieć: 'Jest uparty jak osioł'?" ];
-    answers = [ "Zastosuj wyrażenia potoczne", "C'est une grande gueule", "Il a un caractère de cochon", "C'est un ours", "Il se la joue !", "C'est un fumiste.", "C'est un frimeur", "Elle a le bras long", "Elle est jolie comme un coeur", "Il est frisé comme un mouton", "Marc est laid comme un pou", "Alice est myope comme une taupe", "C'est une peau de vache", "Marc, c'est une poule mouillée", "Il est têtu comme une mule" ];
+    answers = [ "Zastosuj wyrażenia potoczne", "C'est une grande gueule", "Il a un caractère de cochon", "C'est un ours", "Il se la joue !", "C'est un fumiste.", "C'est un frimeur", "Elle a le bras long", "Elle est jolie comme un coeur", "Il est frisé comme un mouton", "Marc est laid comme un pou | Marc est moche comme un pou", "Alice est myope comme une taupe", "C'est une peau de vache", "Marc, c'est une poule mouillée", "Il est têtu comme une mule" ];
     hints = [ "Wyrażenia", "duża gęba", "charakter świni", "niedźwiedź", "udaje kogoś", "dymić", "pokazuje się", "długie ramię", "ładna jak serduszko", "jak owca", "brzydki jak wesz", "krótkowzroczna", "skóra krowy", "mokra kura", "uparty jak muł" ];
 
     var myForm = document.createElement("form");
@@ -118,15 +118,17 @@ function onPageLoad()
     }  
         // CHECKING ANSWERS
 
-    var answer, itemName, itemToCheck, formToCheck, myparagraph, resultWrapper;
+    var answerBad, itemAnswers, itemName, itemToCheck, formToCheck, myparagraph, resultWrapper;
+    var correctAnswer = "";
     var correctNumber = 0;
 
     document.getElementById("button").onclick = function()
     {
         for(var i = 1; i < questions.length; i++)
         {
+            correctAnswer = ""
             keyboardDeactivation();
-            answer = answers[i];
+            itemAnswers = answers[i].split("|");
             itemName = "item" + i;
             formToCheck = document.getElementById("myExercice");
             itemToCheck = formToCheck.elements[itemName].value;
@@ -136,13 +138,42 @@ function onPageLoad()
             {
                 spans[m].parentNode.removeChild(spans[m]);            
             }
-            if (itemToCheck.replace(/[.!?]/g, "").trim() !== answers[i].replace(/[.!?]/g, "").trim())
+
+            for (var k = 0; k < itemAnswers.length; k++)
+            {
+                console.log("itemToCheck JSON:", JSON.stringify(itemToCheck));
+                console.log("answer JSON:", JSON.stringify(itemAnswers[k]));
+                if (itemToCheck.replace(/[.!?]/g, "").trim() !== itemAnswers[k].replace(/[.!?]/g, "").trim())
+                {            
+                    answerBad = true;
+                    console.log("answer is bad")
+                }else
+                {
+                    answerBad = false;
+                    console.log("answer is good")
+                    break;
+                }
+            }
+
+
+            if (answerBad)
             {            
                 myparagraph = document.createElement("span");
                 myparagraph.setAttribute("id", "answer"+i);
                 myparagraph.setAttribute("style", "color:red;");
                 myparagraph.setAttribute("class", "check-answer");
-                myparagraph.innerText = " - La réponse correcte : " + answers[i];
+    
+                for (var j = 0; j < itemAnswers.length; j++)
+                {
+                    if (j > 0){
+                        correctAnswer = correctAnswer + " or ";
+                    }
+                    correctAnswer = correctAnswer + "« " + itemAnswers[j] + " »";
+                }
+                console.log("correctAnswer ")
+                console.log(correctAnswer)
+
+                myparagraph.innerText = " - La réponse correcte : " + correctAnswer;
                 document.getElementById("par"+i).appendChild(myparagraph);
             }else
             {
